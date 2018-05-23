@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User ID"
+        android:textSize="40sp"
+        android:id="@+id/userId"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:layout_marginTop="80dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Subject"
+        android:id="@+id/subject"/>
+
+    <EditText
+        android:layout_marginTop="40dp"
+        android:hint="Content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/content"/>
+
+    <Button
+        android:id="@+id/addNote"
+        android:layout_marginTop="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Note"
+        android:layout_marginLeft="150dp"/>
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="150sp"
+        android:text="Logout"/>
+
+</LinearLayout>
