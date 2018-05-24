@@ -8,18 +8,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,26 +37,30 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Home extends AppCompatActivity implements View.OnClickListener {
+public class Home extends AppCompatActivity {
 
-    TextView userId;
-    EditText subject , content;
-    Button addNote , logout , view;
-    FirebaseAuth auth;
-    GoogleSignInOptions gso;
-    GoogleSignInClient client;
-    FirebaseUser currentUser;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
+    private FirebaseAuth auth;
+    private GoogleSignInOptions gso;
+    private  GoogleSignInClient client;
+    private FirebaseUser currentUser;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private RecyclerView recyclerView;
+    private Query query;
+    private FirebaseRecyclerOptions<Note> options;
+    private FirebaseRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -61,21 +71,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
 
 
-        subject = findViewById(R.id.subject);
-        content = findViewById(R.id.content);
-        addNote = findViewById(R.id.addNote);
-        logout = findViewById(R.id.logout);
-        view = findViewById(R.id.viewNotes);
-        view.setOnClickListener(this);
-        addNote.setOnClickListener(this);
-        logout.setOnClickListener(this);
         auth = FirebaseAuth.getInstance();
-        userId = findViewById(R.id.userId);
         currentUser = auth.getCurrentUser();
-        userId.setText(currentUser.getUid());
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        recyclerView = findViewById(R.id.listNotes);
 
 
 
@@ -90,8 +90,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
 
 
-
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -103,6 +101,45 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         });
 
 
+
+
+        fillRecyclerView();
+
+    }
+
+
+    private  void  fillRecyclerView() {
+
+        query = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(currentUser.getUid())
+                .child("notes");
+        options = new FirebaseRecyclerOptions.Builder<Note>()
+                .setQuery(query , Note.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter < Note , NoteHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull NoteHolder holder, int position, @NonNull Note model) {
+
+                holder.content.setText(model.getContent());
+                holder.subject.setText(model.getSubject());
+            }
+
+
+            @NonNull
+            @Override
+            public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+                View view = LayoutInflater.from(parent.getContext()  ).inflate(R.layout.note_view , parent , false);
+                return  new NoteHolder(view);
+            }
+        };
+
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     @Override
@@ -113,11 +150,12 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
 
-        //Toast.makeText(this , item.getItemId(), Toast.LENGTH_LONG).show();
         if(item.getItemId() == android.R.id.home)
         {
             drawerLayout.openDrawer(GravityCompat.START);
@@ -127,52 +165,18 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         return  super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onStart() {
 
-    private void signOutUser() {
-
-        auth.signOut();
-        client.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-                    Intent intent = new Intent(getApplicationContext() , MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
-
-    }
-
-
-    private void addNewNote() {
-
-        if(subject.getText().toString().equals("") || content.getText().toString().equals(""))
-            return;
-
-
-        String noteId;
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference().child("users").child(currentUser.getUid()).child("notes");
-        noteId = ref.push().getKey();
-        ref.child(noteId).setValue(new Note(subject.getText().toString() , content.getText().toString())).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful())
-                    Toast.makeText(getApplicationContext() , "posted"  , Toast.LENGTH_LONG).show();
-            }
-        });
-        Toast.makeText(this ,noteId, Toast.LENGTH_LONG).show();
-
+        super.onStart();
+        adapter.startListening();
     }
 
     @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.addNote)
-            addNewNote();
-        else if(v.getId() == R.id.logout)
-            signOutUser();
-
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
+
+
 }

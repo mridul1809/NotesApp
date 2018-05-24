@@ -24,6 +24,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity implements  View.OnClickListener{
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         updateUI(FirebaseAuth.getInstance().getCurrentUser());
 
         setContentView(R.layout.activity_main);
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
                 firebaseAuthWithGoogle(account);
             }
             catch (ApiException e) {
-                Toast.makeText(this , "Failed" ,Toast.LENGTH_LONG ).show();
                 updateUI(null);
             }
 
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
                         if(task.isSuccessful())
                             updateUI(auth.getCurrentUser());
                         else
-                            Toast.makeText(getApplicationContext() , "Failed" , Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext() , "Failed to Login" , Toast.LENGTH_LONG).show();
 
                         progressDialog.dismiss();
                     }

@@ -13,19 +13,34 @@
         android:layout_height="wrap_content"
         android:src="@drawable/notes"
         android:layout_centerHorizontal="true"
+        android:elevation="10dp"
         android:id="@+id/logo"
         />
 
-    <com.google.android.gms.common.SignInButton
-        android:layout_marginLeft="50dp"
-        android:layout_marginTop="70dp"
+    <TextView
+        android:id="@+id/notes"
+        android:layout_centerHorizontal="true"
         android:layout_below="@id/logo"
-        android:layout_width="match_parent"
+        android:textSize="40sp"
+        android:textStyle="italic"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notes"/>
+
+    <ImageButton
+        android:src="@drawable/sign_in_logo"
+        android:scaleType="fitCenter"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/notes"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:id="@+id/signIn">
+        android:elevation="15dp"
+        android:id="@+id/signIn"
+        android:background="@null">
 
-    </com.google.android.gms.common.SignInButton>
+    </ImageButton>
 
 
 
