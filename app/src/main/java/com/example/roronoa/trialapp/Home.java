@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -43,6 +44,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     GoogleSignInOptions gso;
     GoogleSignInClient client;
     FirebaseUser currentUser;
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,12 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
+
+
 
         subject = findViewById(R.id.subject);
         content = findViewById(R.id.content);
@@ -65,6 +74,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         currentUser = auth.getCurrentUser();
         userId.setText(currentUser.getUid());
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+
+
+
 
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -74,6 +88,19 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
         client = GoogleSignIn.getClient(this , gso);
 
+
+
+
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setChecked(true);
+                drawerLayout.closeDrawers();
+                Toast.makeText(getApplicationContext() , item.getTitle() ,Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
 
 
     }
@@ -90,8 +117,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
 
 
-        Toast.makeText(this , item.getTitle() , Toast.LENGTH_LONG).show();
-        return  true;
+        //Toast.makeText(this , item.getItemId(), Toast.LENGTH_LONG).show();
+        if(item.getItemId() == android.R.id.home)
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }
+
+        return  super.onOptionsItemSelected(item);
     }
 
 
