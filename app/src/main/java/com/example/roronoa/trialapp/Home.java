@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,8 +26,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -34,7 +38,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     TextView userId;
     EditText subject , content;
-    Button addNote , logout;
+    Button addNote , logout , view;
     FirebaseAuth auth;
     GoogleSignInOptions gso;
     GoogleSignInClient client;
@@ -52,12 +56,15 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         content = findViewById(R.id.content);
         addNote = findViewById(R.id.addNote);
         logout = findViewById(R.id.logout);
+        view = findViewById(R.id.viewNotes);
+        view.setOnClickListener(this);
         addNote.setOnClickListener(this);
         logout.setOnClickListener(this);
         auth = FirebaseAuth.getInstance();
         userId = findViewById(R.id.userId);
         currentUser = auth.getCurrentUser();
         userId.setText(currentUser.getUid());
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -108,18 +115,21 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     private void addNewNote() {
 
-        if(subject.getText().equals("") || content.getText().equals(""))
+        if(subject.getText().toString().equals("") || content.getText().toString().equals(""))
             return;
 
 
         String noteId;
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference().child("users").child(currentUser.getUid()).child("notes");
-        HashMap<String , String> entry = new HashMap<>();
-        entry.put("subject" , subject.getText().toString());
-        entry.put("content" , content.getText().toString());
         noteId = ref.push().getKey();
-        ref.child(noteId).setValue(entry);
+        ref.child(noteId).setValue(new Note(subject.getText().toString() , content.getText().toString())).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful())
+                    Toast.makeText(getApplicationContext() , "posted"  , Toast.LENGTH_LONG).show();
+            }
+        });
         Toast.makeText(this ,noteId, Toast.LENGTH_LONG).show();
 
     }
@@ -128,7 +138,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         if(v.getId() == R.id.addNote)
             addNewNote();
-        else
+        else if(v.getId() == R.id.logout)
             signOutUser();
+
     }
 }
