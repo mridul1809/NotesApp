@@ -55,6 +55,7 @@ public class Home extends AppCompatActivity {
     private Query query;
     private FirebaseRecyclerOptions<Note> options;
     private FirebaseRecyclerAdapter adapter;
+    private TextView userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,14 @@ public class Home extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         recyclerView = findViewById(R.id.listNotes);
+        try {
+            userName = navigationView.getHeaderView(0).findViewById(R.id.userId);
+            userName.setText(currentUser.getEmail());
+        }
+        catch (Exception e)
+        {
+            Log.d("Error" , e.getMessage());
+        }
 
 
 

@@ -7,9 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -38,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     private FirebaseAuth auth;
 
 
-
-    private GoogleSignInOptions gso;
     private GoogleSignInClient client;
 
 
@@ -48,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         updateUI(FirebaseAuth.getInstance().getCurrentUser());
 
         setContentView(R.layout.activity_main);
@@ -58,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         progressDialog.setIndeterminate(true);
 
 
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
