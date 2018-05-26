@@ -102,7 +102,8 @@ public class Home extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                item.setChecked(true);
+                if(item.getItemId() != R.id.logout)
+                    item.setChecked(true);
                 drawerLayout.closeDrawers();
                 Toast.makeText(getApplicationContext() , item.getTitle() ,Toast.LENGTH_LONG).show();
                 return true;

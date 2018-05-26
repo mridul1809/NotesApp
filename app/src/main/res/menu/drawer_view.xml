@@ -3,17 +3,23 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:title="import" />
+            android:id="@+id/show_notes"
+            android:icon="@drawable/view_notes"
+            android:checked="true"
+            android:title="View Notes" />
         <item
-            android:id="@+id/nav_gallery"
-            android:title="gallery" />
+            android:id="@+id/add_note"
+            android:icon="@drawable/add_note"
+            android:title="Add New Note" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:title="slideshow" />
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Settings" />
         <item
-            android:id="@+id/nav_manage"
-            android:title="tools" />
+            android:id="@+id/logout"
+            android:icon="@drawable/logout_icon"
+            android:title="Logout"
+            android:checkable="false"/>
     </group>
 
 </menu>
