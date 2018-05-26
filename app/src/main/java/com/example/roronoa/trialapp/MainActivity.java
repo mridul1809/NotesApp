@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         updateUI(FirebaseAuth.getInstance().getCurrentUser());
 
         setContentView(R.layout.activity_main);

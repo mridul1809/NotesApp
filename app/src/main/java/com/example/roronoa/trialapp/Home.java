@@ -11,19 +11,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -33,29 +28,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Home extends AppCompatActivity {
 
     private FirebaseAuth auth;
-    private GoogleSignInOptions gso;
-    private  GoogleSignInClient client;
     private FirebaseUser currentUser;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private RecyclerView recyclerView;
-    private Query query;
-    private FirebaseRecyclerOptions<Note> options;
     private FirebaseRecyclerAdapter adapter;
-    private TextView userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,40 +60,9 @@ public class Home extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         recyclerView = findViewById(R.id.listNotes);
-        try {
-            userName = navigationView.getHeaderView(0).findViewById(R.id.userId);
-            userName.setText(currentUser.getEmail());
-        }
-        catch (Exception e)
-        {
-            Log.d("Error" , e.getMessage());
-        }
 
 
-
-
-
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        client = GoogleSignIn.getClient(this , gso);
-
-
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.getItemId() != R.id.logout)
-                    item.setChecked(true);
-                drawerLayout.closeDrawers();
-                Toast.makeText(getApplicationContext() , item.getTitle() ,Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
-
+        setNavigationDrawerItems();
 
 
         fillRecyclerView();
@@ -120,12 +72,12 @@ public class Home extends AppCompatActivity {
 
     private  void  fillRecyclerView() {
 
-        query = FirebaseDatabase.getInstance().getReference()
+        Query query = FirebaseDatabase.getInstance().getReference()
                 .child("users")
                 .child(currentUser.getUid())
                 .child("notes");
-        options = new FirebaseRecyclerOptions.Builder<Note>()
-                .setQuery(query , Note.class)
+        FirebaseRecyclerOptions<Note> options = new FirebaseRecyclerOptions.Builder<Note>()
+                .setQuery(query, Note.class)
                 .build();
 
         adapter = new FirebaseRecyclerAdapter < Note , NoteHolder>(options) {
@@ -152,6 +104,77 @@ public class Home extends AppCompatActivity {
 
     }
 
+
+
+
+    private void setNavigationDrawerItems() {
+
+
+        TextView userName = navigationView.getHeaderView(0).findViewById(R.id.userId);
+        userName.setText(currentUser.getEmail());
+
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+
+
+                    case R.id.logout :
+                        logoutUser();
+                        break;
+
+                    case R.id.settings :
+                        break;
+
+                    case R.id.show_notes :
+                        break;
+
+                    case R.id.add_note :
+                        break;
+                }
+
+
+                if(item.getItemId() != R.id.logout)
+                    item.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
+    }
+
+
+
+    private void logoutUser() {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        GoogleSignInClient client = GoogleSignIn.getClient(this, gso);
+
+        auth.signOut();
+
+        client.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+
+                    Intent intent = new Intent(Home.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+                else
+                    Toast.makeText(getApplicationContext() , "Failed to Logout" , Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -159,6 +182,7 @@ public class Home extends AppCompatActivity {
         inflater.inflate(R.menu.action_bar , menu);
         return true;
     }
+
 
 
 
@@ -175,12 +199,18 @@ public class Home extends AppCompatActivity {
         return  super.onOptionsItemSelected(item);
     }
 
+
+
+
     @Override
     public void onStart() {
 
         super.onStart();
         adapter.startListening();
     }
+
+
+
 
     @Override
     protected void onStop() {
