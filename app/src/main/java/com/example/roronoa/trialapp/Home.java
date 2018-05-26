@@ -37,8 +37,8 @@ public class Home extends AppCompatActivity {
     private FirebaseUser currentUser;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private RecyclerView recyclerView;
-    private FirebaseRecyclerAdapter adapter;
+    private ListNotes listNotes;
+    private AddNote addNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,55 +59,28 @@ public class Home extends AppCompatActivity {
         currentUser = auth.getCurrentUser();
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-        recyclerView = findViewById(R.id.listNotes);
+        listNotes = new ListNotes();
+        addNote = new AddNote();
+
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_holder , listNotes)
+                .commit();
 
 
         setNavigationDrawerItems();
 
 
-        fillRecyclerView();
-
     }
 
-
-    private  void  fillRecyclerView() {
-
-        Query query = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .child(currentUser.getUid())
-                .child("notes");
-        FirebaseRecyclerOptions<Note> options = new FirebaseRecyclerOptions.Builder<Note>()
-                .setQuery(query, Note.class)
-                .build();
-
-        adapter = new FirebaseRecyclerAdapter < Note , NoteHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull NoteHolder holder, int position, @NonNull Note model) {
-
-                holder.content.setText(model.getContent());
-                holder.subject.setText(model.getSubject());
-            }
-
-
-            @NonNull
-            @Override
-            public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-                View view = LayoutInflater.from(parent.getContext()  ).inflate(R.layout.note_view , parent , false);
-                return  new NoteHolder(view);
-            }
-        };
-
-
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-    }
 
 
 
 
     private void setNavigationDrawerItems() {
+
+
+        //TODO : Add Settings
 
 
         TextView userName = navigationView.getHeaderView(0).findViewById(R.id.userId);
@@ -129,9 +102,15 @@ public class Home extends AppCompatActivity {
                         break;
 
                     case R.id.show_notes :
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_holder , listNotes)
+                                .commit();
                         break;
 
                     case R.id.add_note :
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_holder , addNote)
+                                .commit();
                         break;
                 }
 
@@ -200,23 +179,6 @@ public class Home extends AppCompatActivity {
     }
 
 
-
-
-    @Override
-    public void onStart() {
-
-        super.onStart();
-        adapter.startListening();
-    }
-
-
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
 
 
 }

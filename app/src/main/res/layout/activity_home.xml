@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -29,17 +29,17 @@
         </android.support.v7.widget.Toolbar>
 
 
-        <android.support.v7.widget.RecyclerView
-            android:background="#dddddd"
-            android:id="@+id/listNotes"
+        <FrameLayout
+            android:layout_below="@id/my_toolbar"
+            android:id="@+id/fragment_holder"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </android.support.v7.widget.RecyclerView>
+        </FrameLayout>
 
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
     <android.support.design.widget.NavigationView
